@@ -1,0 +1,1634 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Misi Penjaga Bumi - Game IPAS Kelas 6</title>
+  <style>
+    :root {
+      --bg: #071526;
+      --bg-soft: #0d2238;
+      --card: rgba(18, 48, 70, .78);
+      --card-light: rgba(31, 75, 93, .72);
+      --cyan: #4de4e9;
+      --green: #62e681;
+      --yellow: #ffd95a;
+      --red: #ff647c;
+      --purple: #a98cff;
+      --text: #f4fbff;
+      --muted: #a9c5d3;
+      --shadow: 0 16px 45px rgba(0, 0, 0, .32);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: "Segoe UI", Arial, sans-serif;
+      background:
+        radial-gradient(circle at 15% 15%, rgba(77, 228, 233, .16), transparent 28%),
+        radial-gradient(circle at 85% 85%, rgba(98, 230, 129, .13), transparent 28%),
+        linear-gradient(135deg, #06111f, #0a2334 52%, #08231e);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .17;
+      background-image:
+        radial-gradient(#fff 1px, transparent 1px),
+        radial-gradient(#fff 1px, transparent 1px);
+      background-size: 80px 80px, 130px 130px;
+      background-position: 0 0, 35px 55px;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .screen {
+      display: none;
+      min-height: 100vh;
+      padding: 28px 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .screen.active {
+      display: block;
+      animation: fadeIn .55s ease;
+    }
+
+    .container {
+      width: min(1120px, 100%);
+      margin: auto;
+    }
+
+    .start-layout {
+      min-height: calc(100vh - 56px);
+      display: grid;
+      place-items: center;
+    }
+
+    .hero-card,
+    .game-card,
+    .result-card {
+      background: linear-gradient(145deg, rgba(16, 47, 69, .9), rgba(8, 29, 47, .86));
+      border: 1px solid rgba(77, 228, 233, .29);
+      border-radius: 30px;
+      box-shadow: var(--shadow), 0 0 45px rgba(77, 228, 233, .08);
+      backdrop-filter: blur(16px);
+    }
+
+    .hero-card {
+      width: min(800px, 100%);
+      padding: clamp(28px, 6vw, 68px);
+      text-align: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      background: rgba(77, 228, 233, .12);
+      top: -95px;
+      right: -95px;
+      filter: blur(3px);
+    }
+
+    .earth {
+      font-size: clamp(70px, 13vw, 120px);
+      display: inline-block;
+      filter: drop-shadow(0 0 18px rgba(77, 228, 233, .65));
+      animation: float 4s ease-in-out infinite;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 8px;
+      color: var(--cyan);
+      letter-spacing: 2px;
+      font-size: clamp(2rem, 6vw, 4.3rem);
+      line-height: 1;
+      text-shadow: 0 0 24px rgba(77, 228, 233, .45);
+    }
+
+    .subtitle {
+      color: var(--yellow);
+      font-size: clamp(1rem, 2.5vw, 1.35rem);
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    .description {
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 600px;
+      margin: 0 auto 28px;
+    }
+
+    .name-form {
+      display: flex;
+      gap: 10px;
+      max-width: 540px;
+      margin: auto;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      min-width: 0;
+      padding: 16px 18px;
+      color: var(--text);
+      background: rgba(0, 0, 0, .27);
+      border: 1px solid rgba(169, 140, 255, .48);
+      border-radius: 14px;
+      outline: none;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 3px rgba(77, 228, 233, .15);
+    }
+
+    .primary-btn,
+    .secondary-btn,
+    .hint-btn,
+    .next-btn {
+      border: 0;
+      border-radius: 14px;
+      padding: 14px 20px;
+      min-height: 50px;
+      color: #061b28;
+      font-weight: 800;
+      transition: transform .2s, box-shadow .2s, filter .2s;
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg, var(--green), var(--cyan));
+      box-shadow: 0 8px 22px rgba(77, 228, 233, .2);
+    }
+
+    .secondary-btn {
+      background: rgba(77, 228, 233, .15);
+      border: 1px solid rgba(77, 228, 233, .45);
+      color: var(--text);
+    }
+
+    .hint-btn {
+      background: linear-gradient(135deg, var(--yellow), #ffb45a);
+    }
+
+    .next-btn {
+      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      margin-top: 18px;
+      width: 100%;
+    }
+
+    .primary-btn:hover,
+    .secondary-btn:hover,
+    .hint-btn:hover,
+    .next-btn:hover {
+      transform: translateY(-3px) scale(1.02);
+      filter: brightness(1.1);
+      box-shadow: 0 9px 25px rgba(77, 228, 233, .28);
+    }
+
+    .records {
+      margin-top: 22px;
+      color: var(--yellow);
+      font-weight: 700;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin-top: 30px;
+    }
+
+    .feature {
+      padding: 14px 8px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid rgba(255, 255, 255, .09);
+      font-size: .88rem;
+      color: var(--muted);
+    }
+
+    .feature strong {
+      display: block;
+      color: var(--text);
+      font-size: 1.18rem;
+      margin-bottom: 5px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      color: var(--cyan);
+      font-size: clamp(1.2rem, 3vw, 1.65rem);
+      font-weight: 900;
+    }
+
+    .sound-btn {
+      min-height: 42px;
+      border-radius: 12px;
+      padding: 9px 13px;
+      color: var(--text);
+      background: rgba(255, 255, 255, .08);
+      border: 1px solid rgba(255, 255, 255, .2);
+    }
+
+    .level-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255, 255, 255, .07);
+      padding: 13px 17px;
+      border-radius: 16px;
+      margin-bottom: 12px;
+      border: 1px solid rgba(255, 255, 255, .1);
+    }
+
+    .level-title {
+      color: var(--yellow);
+      font-weight: 800;
+    }
+
+    .zone-name {
+      color: var(--muted);
+      font-size: .92rem;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 9px;
+      margin-bottom: 15px;
+    }
+
+    .stat {
+      min-width: 0;
+      padding: 12px 10px;
+      text-align: center;
+      border-radius: 14px;
+      background: rgba(0, 0, 0, .2);
+      border: 1px solid rgba(255, 255, 255, .08);
+    }
+
+    .stat-label {
+      display: block;
+      color: var(--muted);
+      font-size: .75rem;
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      color: var(--text);
+      font-size: clamp(1rem, 2.7vw, 1.35rem);
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    #scoreValue {
+      color: var(--yellow);
+    }
+
+    #livesValue {
+      color: var(--red);
+    }
+
+    #comboValue {
+      color: #ff9f4c;
+    }
+
+    #timerValue {
+      color: var(--cyan);
+    }
+
+    .timer-danger {
+      color: var(--red) !important;
+      animation: pulse .8s infinite;
+    }
+
+    .progress-wrap {
+      height: 15px;
+      overflow: hidden;
+      margin-bottom: 22px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, .1);
+      border: 1px solid rgba(255, 255, 255, .12);
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--green), var(--cyan), var(--purple));
+      transition: width .5s ease;
+      box-shadow: 0 0 13px rgba(77, 228, 233, .6);
+    }
+
+    .game-card {
+      padding: clamp(20px, 4vw, 38px);
+      animation: slideUp .5s ease;
+    }
+
+    .mission-tag {
+      display: inline-block;
+      color: #061b28;
+      background: linear-gradient(135deg, var(--green), var(--cyan));
+      padding: 8px 14px;
+      border-radius: 30px;
+      font-weight: 900;
+      font-size: .9rem;
+      margin-bottom: 16px;
+    }
+
+    .question {
+      font-size: clamp(1.2rem, 3vw, 1.75rem);
+      line-height: 1.45;
+      margin-bottom: 24px;
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .option {
+      text-align: left;
+      min-height: 68px;
+      padding: 15px 18px;
+      color: var(--text);
+      background: rgba(255, 255, 255, .07);
+      border: 1px solid rgba(77, 228, 233, .27);
+      border-radius: 15px;
+      transition: transform .2s, background .2s, box-shadow .2s;
+    }
+
+    .option:hover:not(:disabled),
+    .option:focus-visible:not(:disabled) {
+      transform: scale(1.025);
+      background: rgba(77, 228, 233, .16);
+      box-shadow: 0 0 19px rgba(77, 228, 233, .28);
+      outline: none;
+    }
+
+    .option:disabled {
+      cursor: default;
+    }
+
+    .option.correct {
+      background: rgba(98, 230, 129, .26);
+      border-color: var(--green);
+      box-shadow: 0 0 22px rgba(98, 230, 129, .35);
+    }
+
+    .option.wrong {
+      background: rgba(255, 100, 124, .25);
+      border-color: var(--red);
+      box-shadow: 0 0 22px rgba(255, 100, 124, .32);
+    }
+
+    .option.eliminated {
+      opacity: .22;
+      text-decoration: line-through;
+      pointer-events: none;
+    }
+
+    .feedback {
+      display: none;
+      margin-top: 22px;
+      padding: 18px;
+      border-radius: 16px;
+      background: rgba(0, 0, 0, .23);
+      border-left: 5px solid var(--cyan);
+      animation: slideUp .35s ease;
+    }
+
+    .feedback.show {
+      display: block;
+    }
+
+    .feedback-title {
+      font-size: 1.35rem;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+
+    .feedback.correct-feedback {
+      border-color: var(--green);
+    }
+
+    .feedback.wrong-feedback {
+      border-color: var(--red);
+    }
+
+    .feedback p {
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 0;
+    }
+
+    .mission-tools {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .hint-btn:disabled {
+      cursor: not-allowed;
+      opacity: .45;
+      filter: grayscale(.6);
+    }
+
+    .map-title {
+      color: var(--cyan);
+      margin: 28px 0 12px;
+    }
+
+    .map {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .zone-card {
+      min-height: 100px;
+      padding: 15px;
+      border-radius: 17px;
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid rgba(255, 255, 255, .12);
+      transition: .3s;
+    }
+
+    .zone-card.active {
+      border-color: var(--cyan);
+      box-shadow: 0 0 22px rgba(77, 228, 233, .3);
+      transform: translateY(-4px);
+    }
+
+    .zone-card.done {
+      border-color: var(--green);
+      background: rgba(98, 230, 129, .13);
+    }
+
+    .zone-card strong {
+      display: block;
+      margin-bottom: 9px;
+    }
+
+    .zone-card small {
+      color: var(--muted);
+    }
+
+    .result-card {
+      width: min(900px, 100%);
+      margin: auto;
+      padding: clamp(24px, 5vw, 48px);
+      text-align: center;
+    }
+
+    .result-card h1 {
+      font-size: clamp(2rem, 7vw, 4rem);
+    }
+
+    .result-score {
+      color: var(--yellow);
+      font-size: clamp(2rem, 7vw, 4.2rem);
+      font-weight: 900;
+      margin: 18px 0;
+      text-shadow: 0 0 22px rgba(255, 217, 90, .3);
+    }
+
+    .achievement {
+      padding: 18px;
+      margin: 18px auto 24px;
+      max-width: 600px;
+      border: 1px solid rgba(169, 140, 255, .45);
+      border-radius: 17px;
+      background: rgba(169, 140, 255, .13);
+      color: #e5dfff;
+      font-size: 1.25rem;
+      font-weight: 900;
+    }
+
+    .result-stats {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin: 20px 0 30px;
+    }
+
+    .result-stat {
+      padding: 15px 8px;
+      border-radius: 15px;
+      background: rgba(255, 255, 255, .07);
+    }
+
+    .result-stat b {
+      display: block;
+      font-size: 1.4rem;
+      color: var(--cyan);
+      margin-bottom: 6px;
+    }
+
+    .certificate {
+      text-align: center;
+      padding: 28px;
+      margin: 20px auto 26px;
+      max-width: 680px;
+      border: 2px solid var(--yellow);
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(255, 217, 90, .1), rgba(77, 228, 233, .1));
+    }
+
+    .certificate h2 {
+      color: var(--yellow);
+    }
+
+    .certificate-name {
+      font-size: 1.7rem;
+      color: var(--cyan);
+      font-weight: 900;
+      margin: 17px 0;
+    }
+
+    .certificate p {
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 7px;
+    }
+
+    .result-actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    #confettiContainer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 10;
+    }
+
+    .confetti {
+      position: absolute;
+      top: -20px;
+      width: 10px;
+      height: 16px;
+      animation: fall 2.8s linear forwards;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      top: 22px;
+      z-index: 20;
+      transform: translate(-50%, -120px);
+      background: rgba(7, 21, 38, .94);
+      color: var(--text);
+      padding: 14px 20px;
+      border: 1px solid var(--cyan);
+      border-radius: 13px;
+      box-shadow: 0 8px 26px rgba(0, 0, 0, .3);
+      transition: transform .35s ease;
+      text-align: center;
+      font-weight: 800;
+    }
+
+    .toast.show {
+      transform: translate(-50%, 0);
+    }
+
+    .new-record {
+      color: var(--yellow);
+      font-size: 1.2rem;
+      font-weight: 900;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(-4deg); }
+      50% { transform: translateY(-14px) rotate(4deg); }
+    }
+
+    @keyframes pulse {
+      50% { transform: scale(1.06); }
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(110vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    @media (max-width: 800px) {
+      .stats {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .map {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .result-stats {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .screen {
+        padding: 16px 10px;
+      }
+
+      .hero-card {
+        padding: 30px 18px;
+      }
+
+      .name-form {
+        flex-direction: column;
+      }
+
+      .feature-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .feature:last-child {
+        grid-column: span 2;
+      }
+
+      .game-card {
+        padding: 19px 14px;
+      }
+
+      .options {
+        grid-template-columns: 1fr;
+      }
+
+      .map {
+        grid-template-columns: 1fr;
+      }
+
+      .level-box {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .result-stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .result-stat:last-child {
+        grid-column: span 2;
+      }
+
+      .topbar {
+        align-items: flex-start;
+      }
+
+      .mission-tools {
+        flex-direction: column;
+      }
+
+      .hint-btn {
+        width: 100%;
+      }
+    }
+
+    @media print {
+      body {
+        background: white;
+        color: #111;
+      }
+
+      body::before,
+      #startScreen,
+      #gameScreen,
+      .result-actions,
+      #confettiContainer,
+      .toast {
+        display: none !important;
+      }
+
+      #resultScreen {
+        display: block !important;
+        min-height: auto;
+        padding: 0;
+      }
+
+      .result-card {
+        color: #111;
+        box-shadow: none;
+        border: 2px solid #111;
+        background: white;
+      }
+
+      .certificate {
+        color: #111;
+      }
+
+      .certificate p,
+      .achievement {
+        color: #222;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main id="startScreen" class="screen active">
+    <div class="container start-layout">
+      <section class="hero-card">
+        <div class="earth" aria-hidden="true">🌍</div>
+        <h1>MISI PENJAGA BUMI</h1>
+        <div class="subtitle">Game Petualangan IPAS Kelas 6</div>
+        <p class="description">
+          Jelajahi berbagai misi IPAS, jawab tantangan, kumpulkan poin,
+          dan jadilah Penjaga Bumi!
+        </p>
+
+        <form id="startForm" class="name-form">
+          <input
+            id="studentName"
+            type="text"
+            maxlength="30"
+            placeholder="Masukkan nama kamu"
+            aria-label="Nama siswa"
+            autocomplete="name"
+            required
+          />
+          <button class="primary-btn" type="submit" aria-label="Mulai petualangan">
+            🚀 MULAI PETUALANGAN
+          </button>
+        </form>
+
+        <div class="records">
+          🏆 Rekor Terbaik: <span id="highScoreStart">0</span> poin
+          <br />
+          <small id="gamesPlayedStart"></small>
+        </div>
+
+        <div class="feature-grid">
+          <div class="feature"><strong>❤️ 3</strong>Nyawa</div>
+          <div class="feature"><strong>⭐ 25</strong>Misi</div>
+          <div class="feature"><strong>⏱️ 30</strong>Detik</div>
+          <div class="feature"><strong>🏆 4</strong>Medali</div>
+          <div class="feature"><strong>🔥 Combo</strong>Berantai</div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <main id="gameScreen" class="screen">
+    <div class="container">
+      <header class="topbar">
+        <div class="brand">🌍 MISI PENJAGA BUMI</div>
+        <button id="soundToggle" class="sound-btn" type="button" aria-label="Nyalakan atau matikan suara">
+          🔊 SOUND ON
+        </button>
+      </header>
+
+      <section class="level-box">
+        <div>
+          <div id="levelTitle" class="level-title">🌱 LEVEL 1 – PENJELAJAH EKOSISTEM</div>
+          <div id="zoneName" class="zone-name">Zona Ekosistem</div>
+        </div>
+        <div>👤 <span id="playerName">Penjaga Bumi</span></div>
+      </section>
+
+      <section class="stats" aria-label="Statistik permainan">
+        <div class="stat">
+          <span class="stat-label">⭐ SKOR</span>
+          <span id="scoreValue" class="stat-value">0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">❤️ NYAWA</span>
+          <span id="livesValue" class="stat-value">❤️❤️❤️</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">🔥 COMBO</span>
+          <span id="comboValue" class="stat-value">x0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">🎯 MISI</span>
+          <span id="questionValue" class="stat-value">1/25</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">⏱️ TIMER</span>
+          <span id="timerValue" class="stat-value">30</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">✅ BENAR</span>
+          <span id="correctValue" class="stat-value">0</span>
+        </div>
+      </section>
+
+      <div class="progress-wrap" aria-label="Progress misi">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+
+      <section class="game-card">
+        <div id="missionTag" class="mission-tag">🌱 MISI 1 – EKOSISTEM</div>
+        <h2 id="questionText" class="question">Pertanyaan akan muncul di sini.</h2>
+        <div id="options" class="options"></div>
+
+        <div class="mission-tools">
+          <button id="hintButton" class="hint-btn" type="button" aria-label="Gunakan petunjuk">
+            💡 PETUNJUK (-20)
+          </button>
+          <span id="hintStatus" class="zone-name">Petunjuk tersedia</span>
+        </div>
+
+        <div id="feedback" class="feedback" aria-live="polite">
+          <div id="feedbackTitle" class="feedback-title"></div>
+          <p id="feedbackText"></p>
+          <button id="nextButton" class="next-btn" type="button">➡️ LANJUTKAN MISI</button>
+        </div>
+      </section>
+
+      <h2 class="map-title">🗺️ PETA PETUALANGAN</h2>
+      <section id="map" class="map" aria-label="Peta zona petualangan"></section>
+    </div>
+  </main>
+
+  <main id="resultScreen" class="screen">
+    <div class="container">
+      <section class="result-card">
+        <div class="earth" aria-hidden="true">🌍</div>
+        <h1>🏆 PETUALANGAN SELESAI!</h1>
+        <p id="resultGreeting" class="subtitle">Selamat, Penjaga Bumi!</p>
+        <div id="resultScore" class="result-score">⭐ 0 POIN</div>
+        <div id="newRecordText"></div>
+        <div id="achievement" class="achievement"></div>
+
+        <div class="result-stats">
+          <div class="result-stat"><b id="resultCorrect">0</b>✅ Jawaban benar</div>
+          <div class="result-stat"><b id="resultWrong">0</b>❌ Jawaban salah</div>
+          <div class="result-stat"><b id="resultLives">0</b>❤️ Sisa nyawa</div>
+          <div class="result-stat"><b id="resultCombo">0</b>🔥 Combo tertinggi</div>
+          <div class="result-stat"><b id="resultAccuracy">0%</b>🎯 Akurasi</div>
+        </div>
+
+        <section class="certificate">
+          <h2>🏆 SERTIFIKAT PETUALANGAN</h2>
+          <p>Telah menyelesaikan <strong>Misi Penjaga Bumi</strong></p>
+          <div id="certificateName" class="certificate-name">Nama Siswa</div>
+          <p>Skor: <strong id="certificateScore">0</strong> poin</p>
+          <p>Akurasi: <strong id="certificateAccuracy">0%</strong></p>
+          <p>Tanggal permainan: <strong id="certificateDate">-</strong></p>
+        </section>
+
+        <div class="result-actions">
+          <button id="printButton" class="primary-btn" type="button">🖨️ CETAK HASIL</button>
+          <button id="restartButton" class="secondary-btn" type="button">🔄 MAIN LAGI</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div id="confettiContainer"></div>
+  <div id="toast" class="toast" role="status"></div>
+
+  <script>
+    "use strict";
+
+    /*
+      BANK SOAL IPAS KELAS 6
+      zone:
+      0 = Ekosistem
+      1 = Air & Lingkungan
+      2 = Energi
+      3 = Bumi & Perubahan
+    */
+    const questions = [
+      {
+        zone: 0,
+        question: "Manakah yang termasuk komponen abiotik dalam ekosistem?",
+        options: ["Rumput", "Cacing", "Cahaya matahari", "Burung"],
+        answer: 2,
+        explanation: "Komponen abiotik adalah benda tak hidup. Cahaya matahari, air, tanah, dan udara termasuk komponen abiotik."
+      },
+      {
+        zone: 0,
+        question: "Pada rantai makanan rumput → belalang → katak → ular, yang berperan sebagai produsen adalah...",
+        options: ["Rumput", "Belalang", "Katak", "Ular"],
+        answer: 0,
+        explanation: "Rumput membuat makanan sendiri melalui fotosintesis sehingga disebut produsen."
+      },
+      {
+        zone: 0,
+        question: "Organisme yang menguraikan sisa makhluk hidup menjadi zat sederhana disebut...",
+        options: ["Produsen", "Konsumen tingkat satu", "Pengurai", "Pemangsa"],
+        answer: 2,
+        explanation: "Jamur dan bakteri adalah contoh pengurai yang membantu mengembalikan zat hara ke tanah."
+      },
+      {
+        zone: 0,
+        question: "Hubungan antara lebah dan bunga yang saling menguntungkan disebut simbiosis...",
+        options: ["Parasitisme", "Mutualisme", "Komensalisme", "Predasi"],
+        answer: 1,
+        explanation: "Lebah mendapat nektar, sedangkan bunga terbantu proses penyerbukannya. Keduanya mendapat keuntungan."
+      },
+      {
+        zone: 0,
+        question: "Daun kaktus berbentuk duri merupakan bentuk adaptasi untuk...",
+        options: ["Mempercepat penguapan air", "Mengurangi penguapan air", "Menyerap lebih banyak air hujan", "Menarik perhatian hewan"],
+        answer: 1,
+        explanation: "Duri kaktus membantu mengurangi penguapan air di lingkungan gurun yang kering."
+      },
+      {
+        zone: 0,
+        question: "Tumbuhan memerlukan cahaya matahari dalam proses fotosintesis untuk...",
+        options: ["Menghasilkan makanan", "Menghasilkan suara", "Mengubah oksigen menjadi tanah", "Membuat akar bergerak"],
+        answer: 0,
+        explanation: "Fotosintesis menggunakan cahaya matahari untuk membuat makanan berupa glukosa dari air dan karbon dioksida."
+      },
+
+      {
+        zone: 1,
+        question: "Perubahan uap air menjadi titik-titik air dalam siklus air disebut...",
+        options: ["Evaporasi", "Kondensasi", "Infiltrasi", "Presipitasi"],
+        answer: 1,
+        explanation: "Kondensasi adalah perubahan wujud gas menjadi cair, misalnya terbentuknya awan dari uap air."
+      },
+      {
+        zone: 1,
+        question: "Contoh tindakan yang dapat menyebabkan pencemaran air adalah...",
+        options: ["Menanam pohon", "Membuang limbah ke sungai", "Menghemat air", "Membersihkan selokan"],
+        answer: 1,
+        explanation: "Limbah yang dibuang ke sungai dapat mengotori air dan membahayakan makhluk hidup di dalamnya."
+      },
+      {
+        zone: 1,
+        question: "Tindakan paling tepat untuk mengurangi sampah plastik adalah...",
+        options: ["Membakar semua plastik", "Menggunakan tas belanja berulang kali", "Membuang plastik ke sungai", "Mengubur plastik di halaman"],
+        answer: 1,
+        explanation: "Menggunakan tas yang dapat dipakai berulang kali mengurangi jumlah sampah plastik sekali pakai."
+      },
+      {
+        zone: 1,
+        question: "Kegiatan mengolah botol bekas menjadi pot bunga merupakan contoh...",
+        options: ["Daur ulang", "Penguapan", "Pembakaran hutan", "Pencemaran"],
+        answer: 0,
+        explanation: "Daur ulang adalah mengolah barang bekas menjadi barang baru yang bermanfaat."
+      },
+      {
+        zone: 1,
+        question: "Cara menghemat air saat menggosok gigi adalah...",
+        options: ["Membiarkan keran terbuka", "Menutup keran saat tidak digunakan", "Menggunakan air sebanyak-banyaknya", "Membiarkan air mengalir ke selokan"],
+        answer: 1,
+        explanation: "Menutup keran ketika tidak digunakan dapat mengurangi pemborosan air."
+      },
+      {
+        zone: 1,
+        question: "Hutan penting bagi lingkungan karena...",
+        options: ["Menghasilkan lebih banyak asap", "Menyerap karbon dioksida dan menghasilkan oksigen", "Membuat tanah cepat longsor", "Mengurangi jumlah hewan"],
+        answer: 1,
+        explanation: "Pohon menyerap karbon dioksida dan menghasilkan oksigen. Akar pohon juga membantu menahan air dan tanah."
+      },
+
+      {
+        zone: 2,
+        question: "Manakah yang merupakan sumber energi terbarukan?",
+        options: ["Batu bara", "Minyak bumi", "Matahari", "Gas alam"],
+        answer: 2,
+        explanation: "Energi matahari dapat digunakan terus-menerus dan tidak cepat habis, sehingga termasuk energi terbarukan."
+      },
+      {
+        zone: 2,
+        question: "Perubahan energi yang terjadi pada lampu adalah...",
+        options: ["Listrik menjadi cahaya", "Cahaya menjadi gerak", "Panas menjadi bunyi", "Gerak menjadi listrik"],
+        answer: 0,
+        explanation: "Lampu menggunakan energi listrik dan mengubahnya menjadi energi cahaya, juga sedikit energi panas."
+      },
+      {
+        zone: 2,
+        question: "Panel surya mengubah energi ... menjadi energi listrik.",
+        options: ["Bunyi", "Cahaya matahari", "Gerak angin", "Panas bumi"],
+        answer: 1,
+        explanation: "Panel surya menangkap cahaya matahari dan mengubahnya menjadi energi listrik."
+      },
+      {
+        zone: 2,
+        question: "Pembangkit Listrik Tenaga Air memanfaatkan energi...",
+        options: ["Aliran air", "Batu bara", "Cahaya bulan", "Panas tubuh"],
+        answer: 0,
+        explanation: "PLTA memanfaatkan gerakan atau aliran air untuk memutar turbin pembangkit listrik."
+      },
+      {
+        zone: 2,
+        question: "Perilaku yang menunjukkan penghematan energi listrik adalah...",
+        options: ["Menyalakan lampu siang hari", "Mematikan televisi setelah selesai digunakan", "Membuka kulkas terlalu lama", "Menyalakan semua alat listrik"],
+        answer: 1,
+        explanation: "Mematikan alat listrik setelah digunakan dapat mengurangi penggunaan energi yang tidak perlu."
+      },
+      {
+        zone: 2,
+        question: "Batu bara disebut sumber energi tidak terbarukan karena...",
+        options: ["Dapat tumbuh setiap tahun", "Jumlahnya terbatas dan membutuhkan waktu sangat lama untuk terbentuk", "Tidak dapat menghasilkan panas", "Berasal dari cahaya matahari langsung"],
+        answer: 1,
+        explanation: "Batu bara terbentuk selama jutaan tahun. Persediaannya terbatas dan tidak dapat segera diperbarui."
+      },
+
+      {
+        zone: 3,
+        question: "Peristiwa siang dan malam terjadi karena...",
+        options: ["Revolusi bumi", "Rotasi bumi", "Bulan mengelilingi bumi", "Awan bergerak"],
+        answer: 1,
+        explanation: "Rotasi adalah perputaran bumi pada porosnya. Bagian bumi yang menghadap matahari mengalami siang."
+      },
+      {
+        zone: 3,
+        question: "Bumi mengelilingi matahari dalam waktu sekitar...",
+        options: ["24 jam", "7 hari", "30 hari", "365¼ hari"],
+        answer: 3,
+        explanation: "Revolusi bumi mengelilingi matahari berlangsung sekitar 365¼ hari atau satu tahun."
+      },
+      {
+        zone: 3,
+        question: "Bentuk bulan yang tampak seluruhnya terang disebut fase...",
+        options: ["Bulan baru", "Bulan sabit", "Bulan purnama", "Bulan separuh"],
+        answer: 2,
+        explanation: "Pada fase bulan purnama, bagian bulan yang menghadap bumi tampak seluruhnya terkena cahaya matahari."
+      },
+      {
+        zone: 3,
+        question: "Gempa bumi yang disebabkan oleh pergeseran lempeng bumi disebut gempa...",
+        options: ["Tektonik", "Buatan", "Angin", "Hujan"],
+        answer: 0,
+        explanation: "Gempa tektonik terjadi karena pergeseran atau tumbukan lempeng bumi."
+      },
+      {
+        zone: 3,
+        question: "Salah satu tanda gunung api akan meletus adalah...",
+        options: ["Suhu di sekitar kawah meningkat", "Air laut menjadi manis", "Matahari terbit dari barat", "Awan tidak pernah bergerak"],
+        answer: 0,
+        explanation: "Peningkatan suhu di sekitar kawah, gempa kecil, dan keluarnya gas dapat menjadi tanda aktivitas gunung api."
+      },
+      {
+        zone: 3,
+        question: "Kegiatan manusia yang dapat memperparah pemanasan global adalah...",
+        options: ["Menanam pohon", "Menggunakan transportasi umum", "Membakar banyak bahan bakar fosil", "Menghemat listrik"],
+        answer: 2,
+        explanation: "Pembakaran bahan bakar fosil menghasilkan gas rumah kaca yang dapat meningkatkan pemanasan global."
+      },
+      {
+        zone: 3,
+        question: "Saat terjadi gempa bumi ketika berada di dalam kelas, tindakan yang tepat adalah...",
+        options: ["Berlari ke dekat jendela", "Berlindung di bawah meja yang kuat dan melindungi kepala", "Berdiri di bawah lemari", "Menggunakan lift"],
+        answer: 1,
+        explanation: "Berlindung di bawah meja yang kuat dan melindungi kepala membantu mengurangi risiko terkena benda yang jatuh."
+      }
+    ];
+
+    const zones = [
+      { icon: "🌱", name: "EKOSISTEM", range: "Misi 1–6", level: "LEVEL 1 – PENJELAJAH EKOSISTEM" },
+      { icon: "💧", name: "LINGKUNGAN", range: "Misi 7–12", level: "LEVEL 2 – PELINDUNG LINGKUNGAN" },
+      { icon: "⚡", name: "ENERGI", range: "Misi 13–18", level: "LEVEL 3 – MASTER ENERGI" },
+      { icon: "🌏", name: "BUMI", range: "Misi 19–25", level: "LEVEL 4 – PENJAGA BUMI" }
+    ];
+
+    const state = {
+      playerName: "",
+      gameQuestions: [],
+      currentIndex: 0,
+      score: 0,
+      lives: 3,
+      combo: 0,
+      maxCombo: 0,
+      correct: 0,
+      wrong: 0,
+      timeLeft: 30,
+      timer: null,
+      answered: false,
+      hintUsed: false,
+      soundOn: localStorage.getItem("misiSound") !== "off",
+      audioContext: null
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    function shuffle(array) {
+      const copied = [...array];
+      for (let i = copied.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copied[i], copied[j]] = [copied[j], copied[i]];
+      }
+      return copied;
+    }
+
+    function prepareQuestions() {
+      state.gameQuestions = shuffle(questions).map((question) => {
+        const shuffledOptions = shuffle(
+          question.options.map((text, index) => ({
+            text,
+            isCorrect: index === question.answer
+          }))
+        );
+
+        return {
+          ...question,
+          options: shuffledOptions.map((item) => item.text),
+          answer: shuffledOptions.findIndex((item) => item.isCorrect)
+        };
+      });
+    }
+
+    function loadHighScore() {
+      return Number(localStorage.getItem("misiHighScore") || 0);
+    }
+
+    function saveHighScore() {
+      const previous = loadHighScore();
+      const isNewRecord = state.score > previous;
+      if (isNewRecord) {
+        localStorage.setItem("misiHighScore", String(state.score));
+      }
+
+      const oldCombo = Number(localStorage.getItem("misiMaxCombo") || 0);
+      if (state.maxCombo > oldCombo) {
+        localStorage.setItem("misiMaxCombo", String(state.maxCombo));
+      }
+
+      const games = Number(localStorage.getItem("misiGamesPlayed") || 0) + 1;
+      localStorage.setItem("misiGamesPlayed", String(games));
+      return isNewRecord;
+    }
+
+    function loadStartRecords() {
+      $("highScoreStart").textContent = loadHighScore().toLocaleString("id-ID");
+      const games = Number(localStorage.getItem("misiGamesPlayed") || 0);
+      $("gamesPlayedStart").textContent = games ? `🎮 Sudah dimainkan ${games} kali` : "🎮 Jadilah Penjaga Bumi pertama!";
+      $("studentName").value = localStorage.getItem("misiLastName") || "";
+    }
+
+    function startGame() {
+      const name = $("studentName").value.trim();
+      if (!name) {
+        $("studentName").focus();
+        showToast("Tuliskan namamu dulu, Penjaga Bumi! 🌍");
+        return;
+      }
+
+      state.playerName = name;
+      localStorage.setItem("misiLastName", name);
+      state.currentIndex = 0;
+      state.score = 0;
+      state.lives = 3;
+      state.combo = 0;
+      state.maxCombo = 0;
+      state.correct = 0;
+      state.wrong = 0;
+
+      prepareQuestions();
+      showScreen("gameScreen");
+      $("playerName").textContent = state.playerName;
+      renderMap();
+      loadQuestion();
+      playSound("start");
+    }
+
+    function showScreen(screenId) {
+      document.querySelectorAll(".screen").forEach((screen) => screen.classList.remove("active"));
+      $(screenId).classList.add("active");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function getZoneIndex(questionNumber = state.currentIndex) {
+      return state.gameQuestions[questionNumber].zone;
+    }
+
+    function updateLevel() {
+      const zoneIndex = getZoneIndex();
+      const zone = zones[zoneIndex];
+      $("levelTitle").textContent = zone.level;
+      $("zoneName").textContent = `${zone.icon} Zona ${zone.name}`;
+    }
+
+    function loadQuestion() {
+      clearInterval(state.timer);
+      state.answered = false;
+      state.hintUsed = false;
+      state.timeLeft = 30;
+
+      updateLevel();
+      updateStats();
+      renderQuestion();
+      updateTimer();
+      state.timer = setInterval(() => {
+        state.timeLeft--;
+        updateTimer();
+
+        if (state.timeLeft === 10) {
+          playSound("warning");
+          showToast("⏱️ Waktu tinggal 10 detik!");
+        }
+
+        if (state.timeLeft <= 0) {
+          clearInterval(state.timer);
+          handleTimeout();
+        }
+      }, 1000);
+    }
+
+    function renderQuestion() {
+      const current = state.gameQuestions[state.currentIndex];
+      const zone = zones[current.zone];
+      $("missionTag").textContent = `${zone.icon} MISI ${state.currentIndex + 1} – ${zone.name}`;
+      $("questionText").textContent = current.question;
+      $("hintStatus").textContent = "Petunjuk tersedia";
+      $("hintButton").disabled = false;
+      $("feedback").className = "feedback";
+      $("feedbackTitle").textContent = "";
+      $("feedbackText").textContent = "";
+      $("nextButton").textContent = state.currentIndex === 24 ? "🏁 LIHAT HASIL" : "➡️ LANJUTKAN MISI";
+
+      const letters = ["🅰️", "🅱️", "🅲️", "🅳️"];
+      $("options").innerHTML = "";
+
+      current.options.forEach((option, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "option";
+        button.dataset.index = index;
+        button.innerHTML = `<strong>${letters[index]}</strong> ${option}`;
+        button.setAttribute("aria-label", `Pilihan ${letters[index]}: ${option}`);
+        button.addEventListener("click", () => checkAnswer(index));
+        $("options").appendChild(button);
+      });
+
+      $("progressBar").style.width = `${(state.currentIndex / 25) * 100}%`;
+      renderMap();
+    }
+
+    function checkAnswer(selectedIndex) {
+      if (state.answered) return;
+      state.answered = true;
+      clearInterval(state.timer);
+
+      const current = state.gameQuestions[state.currentIndex];
+      const optionButtons = [...document.querySelectorAll(".option")];
+      optionButtons.forEach((button) => {
+        button.disabled = true;
+      });
+
+      const isCorrect = selectedIndex === current.answer;
+      optionButtons[current.answer].classList.add("correct");
+
+      if (isCorrect) {
+        state.correct++;
+        state.combo++;
+        state.maxCombo = Math.max(state.maxCombo, state.combo);
+
+        const earned = updateScore();
+        if (state.combo >= 2) playSound("combo");
+        else playSound("correct");
+
+        showFeedback(
+          true,
+          `🎉 BENAR! +${earned} POIN 🔥 COMBO x${state.combo}`,
+          current.explanation
+        );
+
+        if (state.combo >= 3 || earned >= 180) showConfetti();
+      } else {
+        optionButtons[selectedIndex].classList.add("wrong");
+        state.wrong++;
+        state.lives--;
+        state.combo = 0;
+        updateLives();
+        playSound("wrong");
+
+        showFeedback(
+          false,
+          "❌ BELUM TEPAT!",
+          `${current.explanation} Jawaban yang paling tepat adalah: <strong>${current.options[current.answer]}</strong>.`
+        );
+
+        if (state.lives <= 0) {
+          $("nextButton").textContent = "🏁 LIHAT HASIL";
+        }
+      }
+
+      updateStats();
+    }
+
+    function updateScore() {
+      const baseScore = 100;
+      const timeBonus = state.timeLeft * 3;
+      const comboBonus = (state.combo - 1) * 20;
+      const earned = baseScore + timeBonus + comboBonus;
+      state.score += earned;
+      return earned;
+    }
+
+    function updateLives() {
+      $("livesValue").textContent = "❤️".repeat(Math.max(0, state.lives)) + "🖤".repeat(3 - Math.max(0, state.lives));
+    }
+
+    function updateStats() {
+      $("scoreValue").textContent = state.score.toLocaleString("id-ID");
+      $("livesValue").textContent = "❤️".repeat(Math.max(0, state.lives)) + "🖤".repeat(3 - Math.max(0, state.lives));
+      $("comboValue").textContent = `x${state.combo}`;
+      $("questionValue").textContent = `${state.currentIndex + 1}/25`;
+      $("correctValue").textContent = state.correct;
+    }
+
+    function updateTimer() {
+      const timer = $("timerValue");
+      timer.textContent = state.timeLeft;
+      timer.classList.toggle("timer-danger", state.timeLeft <= 5);
+      timer.style.color = state.timeLeft <= 5
+        ? "var(--red)"
+        : state.timeLeft <= 10
+          ? "var(--yellow)"
+          : "var(--cyan)";
+    }
+
+    function handleTimeout() {
+      if (state.answered) return;
+      state.answered = true;
+      state.wrong++;
+      state.lives--;
+      state.combo = 0;
+
+      const current = state.gameQuestions[state.currentIndex];
+      const optionButtons = [...document.querySelectorAll(".option")];
+      optionButtons.forEach((button) => {
+        button.disabled = true;
+      });
+      optionButtons[current.answer].classList.add("correct");
+
+      playSound("warning");
+      showFeedback(
+        false,
+        "⏰ WAKTU HABIS!",
+        `${current.explanation} Jawaban yang benar adalah: <strong>${current.options[current.answer]}</strong>.`
+      );
+
+      if (state.lives <= 0) $("nextButton").textContent = "🏁 LIHAT HASIL";
+      updateStats();
+    }
+
+    function showFeedback(isCorrect, title, explanation) {
+      const feedback = $("feedback");
+      feedback.className = `feedback show ${isCorrect ? "correct-feedback" : "wrong-feedback"}`;
+      $("feedbackTitle").innerHTML = title;
+      $("feedbackText").innerHTML = explanation;
+      feedback.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    function nextQuestion() {
+      if (!state.answered) return;
+
+      if (state.lives <= 0 || state.currentIndex >= 24) {
+        finishGame();
+        return;
+      }
+
+      state.currentIndex++;
+      loadQuestion();
+    }
+
+    function useHint() {
+      if (state.hintUsed || state.answered) return;
+
+      const current = state.gameQuestions[state.currentIndex];
+      const wrongButtons = [...document.querySelectorAll(".option")]
+        .filter((button) => Number(button.dataset.index) !== current.answer && !button.classList.contains("eliminated"));
+
+      if (!wrongButtons.length) return;
+
+      const selected = wrongButtons[Math.floor(Math.random() * wrongButtons.length)];
+      selected.classList.add("eliminated");
+      state.hintUsed = true;
+      state.score = Math.max(0, state.score - 20);
+      $("hintButton").disabled = true;
+      $("hintStatus").textContent = "Petunjuk sudah digunakan";
+      updateStats();
+      showToast("💡 Satu pilihan yang salah sudah dihilangkan!");
+    }
+
+    function renderMap() {
+      const activeZone = getZoneIndex();
+      $("map").innerHTML = zones.map((zone, index) => {
+        const isDone = index < activeZone || (index === 3 && state.currentIndex >= 24);
+        const isActive = index === activeZone && !isDone;
+
+        return `
+          <div class="zone-card ${isActive ? "active" : ""} ${isDone ? "done" : ""}">
+            <strong>${zone.icon} ${zone.name}</strong>
+            <small>${zone.range}</small>
+            ${isDone ? "<br><small>✅ SELESAI</small>" : isActive ? "<br><small>✨ SEDANG DIMAINKAN</small>" : ""}
+          </div>
+        `;
+      }).join("");
+    }
+
+    function finishGame() {
+      clearInterval(state.timer);
+      const isNewRecord = saveHighScore();
+      const accuracy = Math.round((state.correct / 25) * 100);
+
+      let achievement;
+      if (accuracy >= 90) {
+        achievement = "🌟 PENJAGA BUMI LEGENDARIS";
+      } else if (accuracy >= 75) {
+        achievement = "🚀 PENJELAJAH IPAS HEBAT";
+      } else if (accuracy >= 60) {
+        achievement = "🌱 PENJAGA BUMI MUDA";
+      } else {
+        achievement = "💪 TERUS BERLATIH";
+      }
+
+      $("resultGreeting").textContent = `Selamat, ${state.playerName}! Terima kasih sudah menjaga Bumi.`;
+      $("resultScore").textContent = `⭐ ${state.score.toLocaleString("id-ID")} POIN`;
+      $("achievement").textContent = achievement;
+      $("resultCorrect").textContent = state.correct;
+      $("resultWrong").textContent = state.wrong;
+      $("resultLives").textContent = state.lives;
+      $("resultCombo").textContent = state.maxCombo;
+      $("resultAccuracy").textContent = `${accuracy}%`;
+      $("certificateName").textContent = state.playerName;
+      $("certificateScore").textContent = state.score.toLocaleString("id-ID");
+      $("certificateAccuracy").textContent = `${accuracy}%`;
+      $("certificateDate").textContent = new Intl.DateTimeFormat("id-ID", {
+        dateStyle: "long"
+      }).format(new Date());
+
+      $("newRecordText").innerHTML = isNewRecord
+        ? '<div class="new-record">🎉 REKOR BARU!</div>'
+        : "";
+
+      showScreen("resultScreen");
+      playSound("finish");
+      showConfetti();
+    }
+
+    function restartGame() {
+      showScreen("startScreen");
+      loadStartRecords();
+      $("studentName").focus();
+    }
+
+    function showConfetti() {
+      const container = $("confettiContainer");
+      const colors = ["#4de4e9", "#62e681", "#ffd95a", "#ff647c", "#a98cff"];
+      for (let i = 0; i < 80; i++) {
+        const piece = document.createElement("span");
+        piece.className = "confetti";
+        piece.style.left = `${Math.random() * 100}%`;
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.animationDelay = `${Math.random() * .8}s`;
+        piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+        container.appendChild(piece);
+        setTimeout(() => piece.remove(), 3500);
+      }
+    }
+
+    function showToast(message) {
+      const toast = $("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(showToast.timeout);
+      showToast.timeout = setTimeout(() => toast.classList.remove("show"), 2400);
+    }
+
+    /*
+      Efek suara dibuat dengan Web Audio API.
+      Tidak ada file suara eksternal yang digunakan.
+    */
+    function playSound(type) {
+      if (!state.soundOn) return;
+
+      try {
+        if (!state.audioContext) {
+          state.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        const context = state.audioContext;
+        if (context.state === "suspended") context.resume();
+
+        const patterns = {
+          correct: [[660, 0], [880, .12]],
+          wrong: [[220, 0], [160, .17]],
+          warning: [[500, 0], [500, .15], [500, .3]],
+          combo: [[523, 0], [659, .1], [784, .2], [1046, .3]],
+          start: [[392, 0], [523, .12], [659, .24]],
+          finish: [[523, 0], [659, .13], [784, .26], [1046, .39], [1318, .52]]
+        };
+
+        const notes = patterns[type] || patterns.correct;
+        notes.forEach(([frequency, delay]) => {
+          const oscillator = context.createOscillator();
+          const gain = context.createGain();
+          oscillator.type = type === "wrong" ? "sawtooth" : "sine";
+          oscillator.frequency.value = frequency;
+          gain.gain.setValueAtTime(.0001, context.currentTime + delay);
+          gain.gain.exponentialRampToValueAtTime(.12, context.currentTime + delay + .02);
+          gain.gain.exponentialRampToValueAtTime(.0001, context.currentTime + delay + .18);
+          oscillator.connect(gain);
+          gain.connect(context.destination);
+          oscillator.start(context.currentTime + delay);
+          oscillator.stop(context.currentTime + delay + .2);
+        });
+      } catch (error) {
+        console.warn("Audio tidak tersedia:", error);
+      }
+    }
+
+    function toggleSound() {
+      state.soundOn = !state.soundOn;
+      localStorage.setItem("misiSound", state.soundOn ? "on" : "off");
+      $("soundToggle").textContent = state.soundOn ? "🔊 SOUND ON" : "🔇 SOUND OFF";
+      if (state.soundOn) playSound("correct");
+    }
+
+    $("startForm").addEventListener("submit", (event) => {
+      event.preventDefault();
+      startGame();
+    });
+
+    $("nextButton").addEventListener("click", nextQuestion);
+    $("hintButton").addEventListener("click", useHint);
+    $("soundToggle").addEventListener("click", toggleSound);
+    $("restartButton").addEventListener("click", restartGame);
+    $("printButton").addEventListener("click", () => window.print());
+
+    document.addEventListener("keydown", (event) => {
+      if (!$("gameScreen").classList.contains("active")) return;
+
+      if (!state.answered && ["1", "2", "3", "4"].includes(event.key)) {
+        checkAnswer(Number(event.key) - 1);
+      }
+
+      if (event.key.toLowerCase() === "h") {
+        useHint();
+      }
+
+      if (event.key === "Enter" && state.answered) {
+        nextQuestion();
+      }
+    });
+
+    $("soundToggle").textContent = state.soundOn ? "🔊 SOUND ON" : "🔇 SOUND OFF";
+    loadStartRecords();
+  </script>
+</body>
+</html>
